@@ -1,0 +1,8 @@
+{
+  "name": "CLEAN MAIL + BULK MAIL",
+  "description": "Plataforma completa de limpieza, validación y envíos masivos de email marketing vinculados a listas depuradas de correos válidos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
