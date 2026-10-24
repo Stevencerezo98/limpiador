@@ -31,9 +31,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   useEffect(() => {
     if (!activeCategory?.id) return;
     fetch(`/api/categories/${activeCategory.id}/analytics`)
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data.success && data.data?.domains) {
+        if (data && data.success && data.data?.domains) {
           setDomainBreakdown(data.data.domains);
         }
       })

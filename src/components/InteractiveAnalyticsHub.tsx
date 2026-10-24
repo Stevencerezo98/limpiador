@@ -48,6 +48,7 @@ export const InteractiveAnalyticsHub: React.FC<InteractiveAnalyticsHubProps> = (
       try {
         setLoadingDomains(true);
         const res = await fetch(`/api/categories/${category.id}/analytics`);
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success && data.data?.domains) {
           setDomainStats(data.data.domains);

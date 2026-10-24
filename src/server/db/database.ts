@@ -10,6 +10,8 @@ import {
   CampaignLog,
   UnsubscribedContact,
   ListsRecipientsPreview,
+  SystemUser,
+  DEFAULT_ROLE_PERMISSIONS,
 } from './schema.ts';
 
 interface DatabaseData {
@@ -20,6 +22,7 @@ interface DatabaseData {
   campaigns?: Campaign[];
   campaignLogs?: CampaignLog[];
   unsubscribed?: UnsubscribedContact[];
+  users?: SystemUser[];
 }
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -118,12 +121,56 @@ const DEFAULT_CONFIG: SystemConfig = {
   umbralAlerta: 5000,
 };
 
+const DEFAULT_USERS: SystemUser[] = [
+  {
+    id: 'usr-admin',
+    username: 'admin',
+    name: 'Administrador del Sistema',
+    password: 'admin',
+    role: 'admin',
+    status: 'active',
+    permissions: DEFAULT_ROLE_PERMISSIONS.admin,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'usr-digitalizador',
+    username: 'digitalizador',
+    name: 'Operador Digitalizador',
+    password: 'digitalizador',
+    role: 'digitalizador',
+    status: 'active',
+    permissions: DEFAULT_ROLE_PERMISSIONS.digitalizador,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'usr-marketing',
+    username: 'marketing',
+    name: 'Especialista en Marketing & Campañas',
+    password: 'marketing2026',
+    role: 'marketing',
+    status: 'active',
+    permissions: DEFAULT_ROLE_PERMISSIONS.marketing,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'usr-auditor',
+    username: 'auditor',
+    name: 'Auditor de Calidad (Solo Lectura)',
+    password: 'auditor2026',
+    role: 'visor',
+    status: 'active',
+    permissions: DEFAULT_ROLE_PERMISSIONS.visor,
+    createdAt: new Date().toISOString(),
+  },
+];
+
 class Database {
   private data: DatabaseData = {
     categorias: [],
     correos: [],
     config: DEFAULT_CONFIG,
     landingPlans: [],
+    users: [],
   };
   private isLoaded = false;
 
@@ -174,6 +221,10 @@ class Database {
         if (!this.data.unsubscribed || !Array.isArray(this.data.unsubscribed)) {
           this.data.unsubscribed = [];
         }
+        if (!this.data.users || !Array.isArray(this.data.users) || this.data.users.length === 0) {
+          this.data.users = JSON.parse(JSON.stringify(DEFAULT_USERS));
+          this.persist();
+        }
       } else {
         const now = new Date().toISOString();
         this.data = {
@@ -186,6 +237,7 @@ class Database {
           campaigns: [],
           campaignLogs: [],
           unsubscribed: [],
+          users: JSON.parse(JSON.stringify(DEFAULT_USERS)),
         };
         this.persist();
       }

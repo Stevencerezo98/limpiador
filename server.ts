@@ -18,6 +18,14 @@ async function startServer() {
   // Registrar API REST
   app.use('/api', apiRouter);
 
+  // Proteger cualquier ruta /api para que NUNCA pase a vite.middlewares ni devuelva HTML
+  app.all('/api/*', (req, res) => {
+    res.status(404).json({
+      success: false,
+      message: `Ruta de API no encontrada: ${req.method} ${req.originalUrl}`,
+    });
+  });
+
   // Modo desarrollo con Vite o producción con archivos estáticos
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -28,7 +36,10 @@ async function startServer() {
   } else {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
+    app.get('*', (req, res, next) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return next();
+      }
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
   }

@@ -38,9 +38,9 @@ export const SmtpConfigModal: React.FC<SmtpConfigModalProps> = ({ isOpen, onClos
     if (isOpen) {
       setLoading(true);
       fetch('/api/campaigns/smtp')
-        .then((res) => res.json())
+        .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          if (data.success && data.data) {
+          if (data && data.success && data.data) {
             setEnabled(Boolean(data.data.enabled));
             setHost(data.data.host || 'smtp.gmail.com');
             setPort(Number(data.data.port) || 465);

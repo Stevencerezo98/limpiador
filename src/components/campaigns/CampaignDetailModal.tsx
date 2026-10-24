@@ -52,13 +52,13 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({
         fetch(`/api/campaigns/${campaignId}/logs${statusFilter !== 'ALL' ? `?status=${statusFilter}` : ''}`),
       ]);
 
-      const campData = await campRes.json();
-      const logsData = await logsRes.json();
+      const campData = campRes.ok ? await campRes.json() : null;
+      const logsData = logsRes.ok ? await logsRes.json() : null;
 
-      if (campData.success && campData.data) {
+      if (campData?.success && campData.data) {
         setCampaign(campData.data);
       }
-      if (logsData.success && logsData.data) {
+      if (logsData?.success && logsData.data) {
         setLogs(logsData.data);
       }
     } catch (err) {

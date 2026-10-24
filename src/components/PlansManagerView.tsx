@@ -66,6 +66,10 @@ export const PlansManagerView: React.FC<PlansManagerViewProps> = ({
           Authorization: `Bearer ${session.token}`,
         },
       });
+      if (!res.ok) {
+        setErrorMessage('No se pudieron obtener los planes (HTTP ' + res.status + ')');
+        return;
+      }
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setPlans(data.data);

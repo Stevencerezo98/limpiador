@@ -31,4 +31,12 @@ apiRouter.get('/health', (_req, res) => {
   });
 });
 
+// Capturar CUALQUIER ruta /api no encontrada y responder SIEMPRE con JSON (nunca HTML)
+apiRouter.all('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Ruta de API no encontrada: ${req.method} ${req.originalUrl}`,
+  });
+});
+
 export default apiRouter;

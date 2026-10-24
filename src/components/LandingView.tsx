@@ -42,6 +42,9 @@ export const LandingView: React.FC<LandingViewProps> = ({
       try {
         setLoading(true);
         const res = await fetch('/api/plans');
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
           setPlans(data.data);

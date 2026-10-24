@@ -1,13 +1,121 @@
 export type EstadoEmail = 'VALIDO' | 'GENERICO_ROL' | 'INVALIDO';
 export type TipoEmail = 'Personal' | 'Corporativo' | 'De_Rol';
-export type UserRole = 'admin' | 'digitalizador';
+export type UserRole = 'admin' | 'digitalizador' | 'marketing' | 'visor' | 'custom';
+
+export interface UserPermissions {
+  canUploadFiles: boolean;          // Subir y procesar archivos (.csv, .xlsx, .txt)
+  canValidateSingle: boolean;       // Validar correo individual en tiempo real
+  canExportData: boolean;           // Descargar listas limpias en CSV, Excel, TXT
+  canEditEmails: boolean;           // Editar y corregir correos en la tabla
+  canDeleteEmails: boolean;         // Borrado individual y por selección
+  canPurgeInvalid: boolean;         // Purgar y limpiar inválidos en 1 clic
+  canManageCategories: boolean;     // Crear, editar y vaciar listas/categorías
+  canManageCampaigns: boolean;      // Crear, editar y lanzar campañas masivas
+  canConfigureSmtp: boolean;        // Conectar y configurar servidor SMTP
+  canAccessAnalytics: boolean;      // Ver analítica y salud de entregabilidad
+  canManageUsers: boolean;          // Crear y administrar usuarios y permisos (Admin)
+  canManageSystemPlans: boolean;    // Modificar planes y créditos del sistema (Admin)
+  canBackupRestore: boolean;        // Descargar y restaurar copias de seguridad (Admin)
+}
+
+export interface SystemUser {
+  id: string;
+  username: string;
+  name: string;
+  password: string;
+  role: UserRole;
+  status: 'active' | 'inactive';
+  permissions: UserPermissions;
+  createdAt: string;
+  lastLogin?: string;
+}
 
 export interface UserSession {
+  id?: string;
   username: string;
   name: string;
   role: UserRole;
   token: string;
+  permissions?: UserPermissions;
 }
+
+export const DEFAULT_ROLE_PERMISSIONS: Record<UserRole, UserPermissions> = {
+  admin: {
+    canUploadFiles: true,
+    canValidateSingle: true,
+    canExportData: true,
+    canEditEmails: true,
+    canDeleteEmails: true,
+    canPurgeInvalid: true,
+    canManageCategories: true,
+    canManageCampaigns: true,
+    canConfigureSmtp: true,
+    canAccessAnalytics: true,
+    canManageUsers: true,
+    canManageSystemPlans: true,
+    canBackupRestore: true,
+  },
+  marketing: {
+    canUploadFiles: true,
+    canValidateSingle: true,
+    canExportData: true,
+    canEditEmails: true,
+    canDeleteEmails: false,
+    canPurgeInvalid: false,
+    canManageCategories: true,
+    canManageCampaigns: true,
+    canConfigureSmtp: true,
+    canAccessAnalytics: true,
+    canManageUsers: false,
+    canManageSystemPlans: false,
+    canBackupRestore: false,
+  },
+  digitalizador: {
+    canUploadFiles: true,
+    canValidateSingle: true,
+    canExportData: true,
+    canEditEmails: true,
+    canDeleteEmails: true,
+    canPurgeInvalid: true,
+    canManageCategories: true,
+    canManageCampaigns: false,
+    canConfigureSmtp: false,
+    canAccessAnalytics: true,
+    canManageUsers: false,
+    canManageSystemPlans: false,
+    canBackupRestore: false,
+  },
+  visor: {
+    canUploadFiles: false,
+    canValidateSingle: true,
+    canExportData: false,
+    canEditEmails: false,
+    canDeleteEmails: false,
+    canPurgeInvalid: false,
+    canManageCategories: false,
+    canManageCampaigns: false,
+    canConfigureSmtp: false,
+    canAccessAnalytics: true,
+    canManageUsers: false,
+    canManageSystemPlans: false,
+    canBackupRestore: false,
+  },
+  custom: {
+    canUploadFiles: true,
+    canValidateSingle: true,
+    canExportData: true,
+    canEditEmails: false,
+    canDeleteEmails: false,
+    canPurgeInvalid: false,
+    canManageCategories: false,
+    canManageCampaigns: false,
+    canConfigureSmtp: false,
+    canAccessAnalytics: true,
+    canManageUsers: false,
+    canManageSystemPlans: false,
+    canBackupRestore: false,
+  },
+};
 
 export interface LandingPlan {
   id: string;

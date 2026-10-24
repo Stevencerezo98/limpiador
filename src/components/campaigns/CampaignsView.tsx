@@ -54,6 +54,10 @@ export const CampaignsView: React.FC<CampaignsViewProps> = ({ categories, sessio
   const checkSmtp = useCallback(async () => {
     try {
       const res = await fetch('/api/campaigns/smtp');
+      if (!res.ok) {
+        setIsSmtpConfigured(false);
+        return;
+      }
       const data = await res.json();
       if (data.success && data.data) {
         setIsSmtpConfigured(Boolean(data.data.isConfigured));
@@ -72,6 +76,7 @@ export const CampaignsView: React.FC<CampaignsViewProps> = ({ categories, sessio
     try {
       setLoading(true);
       const res = await fetch('/api/campaigns');
+      if (!res.ok) return;
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setCampaigns(data.data);

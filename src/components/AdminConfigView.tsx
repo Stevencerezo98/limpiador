@@ -45,6 +45,10 @@ export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => 
       const res = await fetch('/api/admin/config', {
         headers: { Authorization: `Bearer ${session.token}` },
       });
+      if (!res.ok) {
+        setErrorMessage('No se pudo cargar la configuración (HTTP ' + res.status + ')');
+        return;
+      }
       const data = await res.json();
       if (data.success && data.data) {
         setConfig(data.data);

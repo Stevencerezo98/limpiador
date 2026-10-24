@@ -40,6 +40,7 @@ export const UpgradePlanModal: React.FC<UpgradePlanModalProps> = ({
       try {
         setLoading(true);
         const res = await fetch('/api/plans');
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
           setPlans(data.data);

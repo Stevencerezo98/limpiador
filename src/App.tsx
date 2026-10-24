@@ -74,6 +74,7 @@ export default function App() {
   const fetchGlobalStats = useCallback(async () => {
     try {
       const res = await fetch('/api/emails/stats');
+      if (!res.ok) return;
       const data = await res.json();
       if (data.success && data.data?.config) {
         setSystemConfig(data.data.config);
@@ -88,6 +89,7 @@ export default function App() {
     try {
       setLoadingCategories(true);
       const res = await fetch('/api/categories');
+      if (!res.ok) return;
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setCategories(data.data);
@@ -140,6 +142,9 @@ export default function App() {
         const res = await fetch(`/api/emails/category/${targetId}?${params.toString()}`, {
           signal: controller.signal,
         });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
         const data = await res.json();
 
         if (data.success && data.data) {

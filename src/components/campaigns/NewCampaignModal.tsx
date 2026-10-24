@@ -185,9 +185,9 @@ export const NewCampaignModal: React.FC<NewCampaignModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetch('/api/campaigns/smtp')
-        .then((res) => res.json())
+        .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          if (data.success && data.data) {
+          if (data && data.success && data.data) {
             if (data.data.senderName) setSenderName(data.data.senderName);
             if (data.data.user) {
               setSenderEmail(data.data.user);
@@ -219,9 +219,9 @@ export const NewCampaignModal: React.FC<NewCampaignModalProps> = ({
     setIsLoadingPreview(true);
 
     fetch(`/api/campaigns/preview-recipients?listIds=${selectedListIds.join(',')}`)
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (isMounted && data.success && data.data) {
+        if (isMounted && data && data.success && data.data) {
           setPreviewData(data.data);
         }
       })
