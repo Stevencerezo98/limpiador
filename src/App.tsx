@@ -14,6 +14,8 @@ import { LandingView } from './components/LandingView.tsx';
 import { PlansManagerView } from './components/PlansManagerView.tsx';
 import { UpgradePlanModal } from './components/UpgradePlanModal.tsx';
 import { CampaignsView } from './components/campaigns/CampaignsView.tsx';
+import { UsersManagerSection } from './components/UsersManagerSection.tsx';
+import { LandingEditorView } from './components/LandingEditorView.tsx';
 import {
   Categoria,
   Correo,
@@ -39,6 +41,26 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<CleanMailTab>('list');
   const [showLanding, setShowLanding] = useState<boolean>(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const host = window.location.hostname.toLowerCase();
+        const search = window.location.search.toLowerCase();
+        const path = window.location.pathname.toLowerCase();
+
+        // 1. Si entra por el subdominio de la app (cleanmail.unio.my o cleanmail.uno.my) o ruta /app
+        const isAppDomain = host.includes('cleanmail') || path.startsWith('/app') || search.includes('app=true');
+        if (isAppDomain) {
+          const saved = localStorage.getItem('cleanmail_session');
+          return !saved; // Si ya tiene sesión va directo al panel, si no muestra login
+        }
+
+        // 2. Si entra por el dominio raíz (unio.my, www.unio.my, uno.my) o ruta /landing
+        const isLandingDomain = host.includes('unio.my') || host.includes('uno.my') || path.startsWith('/landing') || search.includes('landing=true');
+        if (isLandingDomain) {
+          return true; // Siempre muestra la Landing Page comercial
+        }
+      }
+
+      // Por defecto para entorno estándar
       const saved = localStorage.getItem('cleanmail_session');
       return !saved;
     } catch {
@@ -487,8 +509,13 @@ export default function App() {
         <LoginView
           onLoginSuccess={(sess) => {
             setSession(sess);
-            setShowLanding(false);
             setShowLoginModal(false);
+            if (typeof window !== 'undefined' && !window.location.hostname.includes('cleanmail')) {
+              const targetHost = window.location.hostname.includes('unio.my') ? 'cleanmail.unio.my' : 'cleanmail.uno.my';
+              window.location.href = `https://${targetHost}`;
+              return;
+            }
+            setShowLanding(false);
           }}
           onGoToLanding={() => setShowLoginModal(false)}
         />
@@ -499,7 +526,14 @@ export default function App() {
       <LandingView
         onGoToLogin={() => setShowLoginModal(true)}
         session={null}
-        onGoToDashboard={() => setShowLoginModal(true)}
+        onGoToDashboard={() => {
+          if (typeof window !== 'undefined' && !window.location.hostname.includes('cleanmail')) {
+            const targetHost = window.location.hostname.includes('unio.my') ? 'cleanmail.unio.my' : 'cleanmail.uno.my';
+            window.location.href = `https://${targetHost}`;
+            return;
+          }
+          setShowLoginModal(true);
+        }}
       />
     );
   }
@@ -510,7 +544,14 @@ export default function App() {
       <LandingView
         onGoToLogin={() => setShowLanding(false)}
         session={session}
-        onGoToDashboard={() => setShowLanding(false)}
+        onGoToDashboard={() => {
+          if (typeof window !== 'undefined' && !window.location.hostname.includes('cleanmail')) {
+            const targetHost = window.location.hostname.includes('unio.my') ? 'cleanmail.unio.my' : 'cleanmail.uno.my';
+            window.location.href = `https://${targetHost}`;
+            return;
+          }
+          setShowLanding(false);
+        }}
       />
     );
   }
@@ -526,8 +567,8 @@ export default function App() {
         <CleanMailSidebar
           activeTab={activeTab}
           onSelectTab={(tab) => {
-            // Protección de rol: Si no es admin y quiere entrar a admin_config o planes, redirigir
-            if ((tab === 'admin_config' || tab === 'plans') && session.role !== 'admin') {
+            // Protección de rol: Si no es admin y quiere entrar a vistas administrativas, redirigir
+            if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor') && session.role !== 'admin') {
               setActiveTab('list');
               return;
             }
@@ -551,7 +592,7 @@ export default function App() {
             <CleanMailSidebar
               activeTab={activeTab}
               onSelectTab={(tab) => {
-                if ((tab === 'admin_config' || tab === 'plans') && session.role !== 'admin') {
+                if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor') && session.role !== 'admin') {
                   setActiveTab('list');
                 } else {
                   setActiveTab(tab);
@@ -696,8 +737,24 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'users' && session.role === 'admin' && (
+            <div className="max-w-5xl mx-auto space-y-6">
+              <UsersManagerSection session={session} />
+            </div>
+          )}
+
+          {activeTab === 'landing_editor' && session.role === 'admin' && (
+            <LandingEditorView
+              session={session}
+              onPreviewLanding={() => setShowLanding(true)}
+            />
+          )}
+
           {activeTab === 'admin_config' && session.role === 'admin' && (
-            <AdminConfigView session={session} />
+            <AdminConfigView
+              session={session}
+              onOpenLandingEditor={() => setActiveTab('landing_editor')}
+            />
           )}
 
           {activeTab === 'api' && <SettingsView />}

@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { EmailService } from '../services/email.service.ts';
 import { CategoryService } from '../services/category.service.ts';
 import { parseFileContent } from '../utils/fileParser.ts';
-import { EstadoEmail, TipoEmail, ExternalValidationProvider } from '../db/schema.ts';
+import type { EstadoEmail, TipoEmail, ExternalValidationProvider } from '../db/schema.ts';
 import { db } from '../db/database.ts';
 
 export class EmailController {

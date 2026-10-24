@@ -5,7 +5,7 @@
  */
 
 import dns from 'dns';
-import { ExternalValidationProvider, ExternalVerifyOptions } from '../db/schema.ts';
+import type { ExternalValidationProvider, ExternalVerifyOptions } from '../db/schema.ts';
 import {
   validateProviderSpecificRules,
   detectSuspiciousPatterns,

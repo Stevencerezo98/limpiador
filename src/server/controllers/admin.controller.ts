@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { db } from '../db/database.ts';
 
 export class AdminController {
@@ -236,5 +236,155 @@ export class AdminController {
       return res.status(500).json({ success: false, message: (err as Error).message });
     }
   }
+
+  // --- GESTIÓN DE USUARIOS Y CONTROL DE ACCESOS (RBAC) ---
+
+  public static getUsers(_req: Request, res: Response) {
+    try {
+      const users = db.getUsers().map((u) => ({
+        id: u.id,
+        username: u.username,
+        name: u.name,
+        role: u.role,
+        status: u.status,
+        permissions: u.permissions,
+        createdAt: u.createdAt,
+        lastLogin: u.lastLogin,
+      }));
+      return res.status(200).json({ success: true, data: users });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  public static createUser(req: Request, res: Response) {
+    try {
+      const { username, name, password, role, status, permissions } = req.body;
+      if (!username || !name) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nombre de usuario y nombre completo son obligatorios.',
+        });
+      }
+
+      const newUser = db.createUser({
+        username,
+        name,
+        password,
+        role,
+        status,
+        permissions,
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: `Usuario "${newUser.name}" creado con éxito.`,
+        data: {
+          id: newUser.id,
+          username: newUser.username,
+          name: newUser.name,
+          role: newUser.role,
+          status: newUser.status,
+          permissions: newUser.permissions,
+          createdAt: newUser.createdAt,
+        },
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  public static updateUser(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { username, name, password, role, status, permissions } = req.body;
+
+      const updated = db.updateUser(id, {
+        username,
+        name,
+        password,
+        role,
+        status,
+        permissions,
+      });
+
+      if (!updated) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Usuario "${updated.name}" actualizado con éxito.`,
+        data: {
+          id: updated.id,
+          username: updated.username,
+          name: updated.name,
+          role: updated.role,
+          status: updated.status,
+          permissions: updated.permissions,
+          createdAt: updated.createdAt,
+        },
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  public static deleteUser(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const deleted = db.deleteUser(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+      }
+      return res.status(200).json({ success: true, message: 'Usuario eliminado correctamente.' });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  // ==========================================
+  // CMS: GESTIÓN DE PÁGINA LANDING (unio.my)
+  // ==========================================
+
+  public static getPublicLandingConfig(_req: Request, res: Response) {
+    try {
+      const config = db.getLandingConfig();
+      return res.status(200).json({ success: true, data: config });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  public static updateLandingConfig(req: Request, res: Response) {
+    try {
+      const updates = req.body;
+      if (!updates || typeof updates !== 'object') {
+        return res.status(400).json({ success: false, message: 'Datos de configuración inválidos.' });
+      }
+      const updated = db.updateLandingConfig(updates);
+      return res.status(200).json({
+        success: true,
+        message: '¡Página Landing actualizada con éxito!',
+        data: updated,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
+
+  public static resetLandingConfig(_req: Request, res: Response) {
+    try {
+      const reset = db.resetLandingConfig();
+      return res.status(200).json({
+        success: true,
+        message: '¡Landing restablecida a los valores recomendados!',
+        data: reset,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: (err as Error).message });
+    }
+  }
 }
+
 

@@ -1,6 +1,6 @@
 import { db } from '../db/database.ts';
 import * as xlsx from 'xlsx';
-import {
+import type {
   Correo,
   EstadoEmail,
   TipoEmail,

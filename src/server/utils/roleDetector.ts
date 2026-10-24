@@ -1,7 +1,7 @@
 /**
  * Identificación de correos de rol / genéricos y clasificación de tipo de cuenta
  */
-import { TipoEmail } from '../db/schema.ts';
+import type { TipoEmail } from '../db/schema.ts';
 
 // Prefijos de cuentas de rol / genéricas comunes (en español e inglés)
 const ROLE_PREFIXES = new Set<string>([

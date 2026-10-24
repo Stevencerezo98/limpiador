@@ -29002,5 +29002,311 @@
       "reason": "Solicitud voluntaria desde pie de correo",
       "unsubscribedAt": "2026-10-13T21:23:10.966Z"
     }
-  ]
+  ],
+  "users": [
+    {
+      "id": "usr-admin",
+      "username": "admin",
+      "name": "Administrador del Sistema",
+      "password": "admin",
+      "role": "admin",
+      "status": "active",
+      "permissions": {
+        "canUploadFiles": true,
+        "canValidateSingle": true,
+        "canExportData": true,
+        "canEditEmails": true,
+        "canDeleteEmails": true,
+        "canPurgeInvalid": true,
+        "canManageCategories": true,
+        "canManageCampaigns": true,
+        "canConfigureSmtp": true,
+        "canAccessAnalytics": true,
+        "canManageUsers": true,
+        "canManageSystemPlans": true,
+        "canBackupRestore": true
+      },
+      "createdAt": "2026-10-24T06:56:17.763Z",
+      "lastLogin": "2026-10-24T07:04:08.654Z"
+    },
+    {
+      "id": "usr-digitalizador",
+      "username": "digitalizador",
+      "name": "Operador Digitalizador",
+      "password": "digitalizador",
+      "role": "digitalizador",
+      "status": "active",
+      "permissions": {
+        "canUploadFiles": true,
+        "canValidateSingle": true,
+        "canExportData": true,
+        "canEditEmails": true,
+        "canDeleteEmails": true,
+        "canPurgeInvalid": true,
+        "canManageCategories": true,
+        "canManageCampaigns": false,
+        "canConfigureSmtp": false,
+        "canAccessAnalytics": true,
+        "canManageUsers": false,
+        "canManageSystemPlans": false,
+        "canBackupRestore": false
+      },
+      "createdAt": "2026-10-24T06:56:17.763Z"
+    },
+    {
+      "id": "usr-marketing",
+      "username": "marketing",
+      "name": "Especialista en Marketing & Campañas",
+      "password": "marketing2026",
+      "role": "marketing",
+      "status": "active",
+      "permissions": {
+        "canUploadFiles": true,
+        "canValidateSingle": true,
+        "canExportData": true,
+        "canEditEmails": true,
+        "canDeleteEmails": false,
+        "canPurgeInvalid": false,
+        "canManageCategories": true,
+        "canManageCampaigns": true,
+        "canConfigureSmtp": true,
+        "canAccessAnalytics": true,
+        "canManageUsers": false,
+        "canManageSystemPlans": false,
+        "canBackupRestore": false
+      },
+      "createdAt": "2026-10-24T06:56:17.763Z"
+    },
+    {
+      "id": "usr-auditor",
+      "username": "auditor",
+      "name": "Auditor de Calidad (Solo Lectura)",
+      "password": "auditor2026",
+      "role": "visor",
+      "status": "active",
+      "permissions": {
+        "canUploadFiles": false,
+        "canValidateSingle": true,
+        "canExportData": false,
+        "canEditEmails": false,
+        "canDeleteEmails": false,
+        "canPurgeInvalid": false,
+        "canManageCategories": false,
+        "canManageCampaigns": false,
+        "canConfigureSmtp": false,
+        "canAccessAnalytics": true,
+        "canManageUsers": false,
+        "canManageSystemPlans": false,
+        "canBackupRestore": false
+      },
+      "createdAt": "2026-10-24T06:56:17.763Z"
+    }
+  ],
+  "landingConfig": {
+    "announcement": {
+      "enabled": true,
+      "text": "Motor de verificación DNS MX en vivo activo con 99.8% de precisión en entregabilidad",
+      "badge": "ACTUALIZACIÓN 2026",
+      "linkUrl": "#planes"
+    },
+    "hero": {
+      "badge": "Motor Profesional de Verificación & Entregabilidad",
+      "titleStart": "Limpia tus listas de correo y",
+      "titleHighlight": "garantiza el 99%",
+      "titleEnd": "de entregabilidad",
+      "subtitle": "Elimina rebotes duros, filtra servidores inexistentes mediante DNS MX en vivo, detecta correos temporales o desechables y obtén máxima puntuación de confianza para tus bases de datos CSV y XLSX.",
+      "primaryCtaText": "Probar Limpieza Gratis",
+      "primaryCtaUrl": "https://cleanmail.unio.my",
+      "secondaryCtaText": "Ver Planes de Depuración",
+      "secondaryCtaUrl": "#planes"
+    },
+    "quickTester": {
+      "enabled": true,
+      "title": "Auditoría Rápida de Correo en Vivo",
+      "subtitle": "Prueba la velocidad y precisión de nuestra verificación sintáctica y DNS en 1 segundo:",
+      "placeholder": "ejemplo@empresa.com o tu-correo@gmail.com",
+      "buttonText": "Auditar Correo"
+    },
+    "stats": [
+      {
+        "id": "stat-1",
+        "value": "14.2M+",
+        "label": "Correos Depurados",
+        "sublabel": "Sin rebotes duros"
+      },
+      {
+        "id": "stat-2",
+        "value": "99.8%",
+        "label": "Precisión DNS MX",
+        "sublabel": "En servidores globales"
+      },
+      {
+        "id": "stat-3",
+        "value": "4,900+",
+        "label": "Empresas & Agencias",
+        "sublabel": "Confían en CleanMail"
+      },
+      {
+        "id": "stat-4",
+        "value": "0%",
+        "label": "Listas Compartidas",
+        "sublabel": "Privacidad 100% aislada"
+      }
+    ],
+    "benchmark": {
+      "enabled": true,
+      "title": "El Impacto Real de Limpiar tus Listas",
+      "subtitle": "Compara el rendimiento antes y después de pasar tus bases de datos por CleanMail:",
+      "beforeCleanMail": {
+        "title": "Tus Campañas SIN Depurar",
+        "bounceRate": "24.8% de Rebotes",
+        "spamRate": "42.0% en Carpeta Spam",
+        "openRate": "11.5% Tasa de Apertura",
+        "reputationStatus": "Alto riesgo de Lista Negra"
+      },
+      "afterCleanMail": {
+        "title": "Tus Campañas CON CleanMail",
+        "bounceRate": "< 0.5% Rebotes Duros",
+        "spamRate": "99.2% Bandeja de Entrada",
+        "openRate": "38.4% Tasa de Apertura",
+        "reputationStatus": "Reputación 10/10 en ESPs"
+      }
+    },
+    "testimonials": [
+      {
+        "id": "test-1",
+        "name": "Carlos Mendoza",
+        "role": "Director de Crecimiento",
+        "company": "ScaleMarketing B2B",
+        "avatarText": "CM",
+        "rating": 5,
+        "comment": "Redujimos nuestra tasa de rebote del 19% al 0.3% en SendGrid desde la primera depuración. Salvaron nuestro dominio principal de ser catalogado como spammer.",
+        "metricHighlight": "+310% Entregabilidad Inbox",
+        "verified": true
+      },
+      {
+        "id": "test-2",
+        "name": "Valentina Restrepo",
+        "role": "Especialista en Email Marketing",
+        "company": "Nova Ecommerce Global",
+        "avatarText": "VR",
+        "rating": 5,
+        "comment": "Procesar bases de datos de más de 80,000 contactos en minutos y luego poder lanzar la campaña desde la misma plataforma nos ahorró pagar 2 suscripciones adicionales.",
+        "metricHighlight": "Ahorro de $450/mes",
+        "verified": true
+      },
+      {
+        "id": "test-3",
+        "name": "Andrés Felipe Gómez",
+        "role": "Head of Sales Operations",
+        "company": "LeadPros SaaS",
+        "avatarText": "AG",
+        "rating": 5,
+        "comment": "La detección estricta de servidores MX identifica instantáneamente dominios de clientes que quebraron o dieron de baja su hosting. Esencial para prospección en frío.",
+        "metricHighlight": "99.4% Entregabilidad Real",
+        "verified": true
+      },
+      {
+        "id": "test-4",
+        "name": "Mariana Silva",
+        "role": "Coordinadora de Campañas",
+        "company": "Agencia Digital Nexus",
+        "avatarText": "MS",
+        "rating": 5,
+        "comment": "El sistema de permisos por roles y la deduplicación masiva automática evita que dos personas del equipo contacten o carguen dos veces la misma lista.",
+        "metricHighlight": "Cero Quejas de Spam",
+        "verified": true
+      }
+    ],
+    "guarantee": {
+      "title": "Garantía de Privacidad & Cero Retención",
+      "subtitle": "La seguridad y confidencialidad de tus contactos es nuestra prioridad absoluta.",
+      "slaPercentage": "99.9% SLA",
+      "zeroDataRetentionText": "Tus listas de contactos son estrictamente confidenciales. Nunca vendemos, compartimos, alquilamos ni entrenamos modelos con los datos que subes. Todos los archivos se procesan de forma privada y cifrada.",
+      "complianceBadges": [
+        "Cifrado SSL/TLS de 256 bits",
+        "Cumplimiento GDPR & CAN-SPAM",
+        "Procesamiento Aislado por Cuenta",
+        "Sin Retención Comercial de Datos"
+      ]
+    },
+    "securityBadges": [
+      {
+        "id": "sec-1",
+        "title": "DNS MX en Tiempo Real",
+        "description": "Consultas en vivo a los servidores de correo de Google, Microsoft, Yahoo y corporativos.",
+        "iconName": "Server"
+      },
+      {
+        "id": "sec-2",
+        "title": "Filtro Anti-Desechables",
+        "description": "Base de datos actualizada con más de 4,000 dominios de correos temporales (10MinuteMail, TempMail).",
+        "iconName": "ShieldAlert"
+      },
+      {
+        "id": "sec-3",
+        "title": "Corrección Automática de Typos",
+        "description": "Repara automáticamente errores comunes como @gmai.com, @hotmial.com o @yahooo.es.",
+        "iconName": "Wand2"
+      },
+      {
+        "id": "sec-4",
+        "title": "Deduplicación Inteligente",
+        "description": "Elimina registros duplicados en cargas masivas para ahorrar créditos y evitar envíos dobles.",
+        "iconName": "CopyX"
+      }
+    ],
+    "faq": [
+      {
+        "id": "faq-1",
+        "question": "¿Cómo funciona la verificación de servidores MX en vivo?",
+        "answer": "CleanMail realiza una consulta DNS de alta velocidad a los registros MX (Mail Exchange) del dominio del correo. Si el dominio no tiene un servidor de correo activo capaz de recibir mensajes, el correo se clasifica inmediatamente como Inválido, evitando rebotes duros.",
+        "category": "Técnico"
+      },
+      {
+        "id": "faq-2",
+        "question": "¿Qué ocurre con los correos temporales o desechables?",
+        "answer": "Nuestro motor compara el dominio con una lista permanentemente actualizada de servicios de correo desechables (como GuerrillaMail, TempMail, Yopmail). Estos correos se marcan como Inválidos o de Alto Riesgo.",
+        "category": "Seguridad"
+      },
+      {
+        "id": "faq-3",
+        "question": "¿Qué son los correos de Rol o Genéricos?",
+        "answer": "Son direcciones como ventas@, info@, soporte@, admin@ o billing@. Aunque técnicamente pueden recibir correos, suelen pertenecer a buzones compartidos con altas tasas de quejas. CleanMail te permite aislarlos en una lista separada para proteger tu reputación.",
+        "category": "Entregabilidad"
+      },
+      {
+        "id": "faq-4",
+        "question": "¿Puedo enviar campañas directamente desde CleanMail?",
+        "answer": "Sí. CleanMail incluye un módulo completo de Email Marketing que te permite redactar correos en HTML, conectar tu servidor SMTP (o Gmail, SendGrid, Amazon SES) y realizar envíos escalonados con pausas entre correos para evitar bloqueos.",
+        "category": "Envíos"
+      },
+      {
+        "id": "faq-5",
+        "question": "¿Mis contactos y bases de datos se almacenan de forma segura?",
+        "answer": "Absolutamente. Todas las bases de datos están aisladas en tu instancia privada, protegidas mediante cifrado de 256 bits y sujetas a nuestra política de Cero Retención Comercial. Nadie más tiene acceso a tus listas.",
+        "category": "Privacidad"
+      },
+      {
+        "id": "faq-6",
+        "question": "¿Cómo adquiero más créditos si se me agotan?",
+        "answer": "Puedes actualizar tu plan o solicitar una recarga de créditos en cualquier momento desde tu panel o poniéndote en contacto con nuestro equipo de soporte por WhatsApp.",
+        "category": "Planes"
+      }
+    ],
+    "contact": {
+      "enabled": true,
+      "headline": "¿Necesitas un Plan a Medida o Soporte Empresarial?",
+      "subheadline": "Habla directamente con nuestro equipo de entregabilidad para cotizaciones especiales o soporte técnico.",
+      "whatsappNumber": "+57 300 123 4567",
+      "whatsappMessage": "Hola, me interesa información sobre los planes de depuración y envíos masivos de CleanMail.",
+      "supportEmail": "soporte@unio.my",
+      "telegramUsername": "cleanmail_support"
+    },
+    "footer": {
+      "companyName": "CleanMail",
+      "tagline": "Plataforma Profesional de Limpieza, Verificación y Envíos Masivos de Email",
+      "copyrightText": "Todos los derechos reservados. Desarrollado para alta entregabilidad en marketing B2B y B2C."
+    }
+  }
 }

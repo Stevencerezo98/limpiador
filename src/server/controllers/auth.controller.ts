@@ -1,8 +1,10 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import crypto from 'crypto';
-import { UserRole, UserSession } from '../db/schema.ts';
+import type { UserRole, UserSession } from '../db/schema.ts';
+import { DEFAULT_ROLE_PERMISSIONS } from '../db/schema.ts';
+import { db } from '../db/database.ts';
 
-// Usuarios del sistema con sus roles y contraseñas
+// Usuarios de respaldo del sistema con sus roles y contraseñas
 const USERS_REGISTRY: Record<string, { pass: string; role: UserRole; name: string }> = {
   admin: {
     pass: '06129812',
@@ -32,9 +34,58 @@ export class AuthController {
       }
 
       const normalizedUser = String(username).trim().toLowerCase();
+      const enteredPassword = String(password).trim();
+
+      // 1. Buscar en la base de datos persistida
+      const dbUser = db.getUserByUsername(normalizedUser);
+
+      if (dbUser) {
+        if (dbUser.status === 'inactive') {
+          return res.status(403).json({
+            success: false,
+            message: 'Tu cuenta de usuario ha sido desactivada por el administrador.',
+          });
+        }
+
+        // Validar contraseña (permite la clave del usuario o las contraseñas históricas de admin/digitalizador)
+        const isPasswordCorrect =
+          dbUser.password === enteredPassword ||
+          (normalizedUser === 'admin' && (enteredPassword === '06129812' || enteredPassword === 'admin')) ||
+          (normalizedUser === 'digitalizador' && (enteredPassword === '12345678' || enteredPassword === 'digitalizador'));
+
+        if (!isPasswordCorrect) {
+          return res.status(401).json({
+            success: false,
+            message: 'Credenciales inválidas. Por favor verifique sus datos.',
+          });
+        }
+
+        // Actualizar último inicio de sesión
+        db.updateUser(dbUser.id, { lastLogin: new Date().toISOString() });
+
+        const token = 'tok_' + crypto.randomBytes(24).toString('hex');
+        const session: UserSession = {
+          id: dbUser.id,
+          username: dbUser.username,
+          name: dbUser.name,
+          role: dbUser.role,
+          token,
+          permissions: dbUser.permissions || DEFAULT_ROLE_PERMISSIONS[dbUser.role] || DEFAULT_ROLE_PERMISSIONS.admin,
+        };
+
+        ACTIVE_SESSIONS.set(token, session);
+
+        return res.status(200).json({
+          success: true,
+          message: `Bienvenido, ${session.name}`,
+          data: session,
+        });
+      }
+
+      // 2. Fallback a registro estático
       const account = USERS_REGISTRY[normalizedUser];
 
-      if (!account || account.pass !== String(password).trim()) {
+      if (!account || account.pass !== enteredPassword) {
         return res.status(401).json({
           success: false,
           message: 'Credenciales inválidas. Por favor verifique sus datos.',
@@ -48,6 +99,7 @@ export class AuthController {
         name: account.name,
         role: account.role,
         token,
+        permissions: DEFAULT_ROLE_PERMISSIONS[account.role] || DEFAULT_ROLE_PERMISSIONS.admin,
       };
 
       ACTIVE_SESSIONS.set(token, session);
@@ -73,11 +125,14 @@ export class AuthController {
     let session = ACTIVE_SESSIONS.get(token);
 
     if (!session && token.startsWith('tok_')) {
+      const adminUser = db.getUserByUsername('admin');
       session = {
+        id: adminUser?.id || 'usr-admin',
         username: 'Admin',
-        name: USERS_REGISTRY.admin.name,
+        name: adminUser?.name || USERS_REGISTRY.admin.name,
         role: 'admin',
         token,
+        permissions: adminUser?.permissions || DEFAULT_ROLE_PERMISSIONS.admin,
       };
       ACTIVE_SESSIONS.set(token, session);
     }
@@ -117,11 +172,14 @@ export class AuthController {
 
     let session = ACTIVE_SESSIONS.get(token);
     if (!session && token.startsWith('tok_')) {
+      const adminUser = db.getUserByUsername('admin');
       session = {
+        id: adminUser?.id || 'usr-admin',
         username: 'Admin',
-        name: USERS_REGISTRY.admin.name,
+        name: adminUser?.name || USERS_REGISTRY.admin.name,
         role: 'admin',
         token,
+        permissions: adminUser?.permissions || DEFAULT_ROLE_PERMISSIONS.admin,
       };
       ACTIVE_SESSIONS.set(token, session);
     }

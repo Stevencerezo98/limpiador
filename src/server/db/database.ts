@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {
+import type {
   Categoria,
   Correo,
   EmailFilterOptions,
@@ -11,8 +11,11 @@ import {
   UnsubscribedContact,
   ListsRecipientsPreview,
   SystemUser,
-  DEFAULT_ROLE_PERMISSIONS,
+  UserRole,
+  UserPermissions,
+  LandingConfig,
 } from './schema.ts';
+import { DEFAULT_ROLE_PERMISSIONS, DEFAULT_LANDING_CONFIG } from './schema.ts';
 
 interface DatabaseData {
   categorias: Categoria[];
@@ -23,6 +26,7 @@ interface DatabaseData {
   campaignLogs?: CampaignLog[];
   unsubscribed?: UnsubscribedContact[];
   users?: SystemUser[];
+  landingConfig?: LandingConfig;
 }
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -1044,6 +1048,118 @@ class Database {
     return this.data.unsubscribed || [];
   }
 
+  // --- MÉTODOS DE GESTIÓN DE USUARIOS Y PERMISOS (RBAC) ---
+
+  public getUsers(): SystemUser[] {
+    if (!this.data.users || this.data.users.length === 0) {
+      this.data.users = JSON.parse(JSON.stringify(DEFAULT_USERS));
+      this.persist();
+    }
+    return this.data.users || [];
+  }
+
+  public getUserById(id: string): SystemUser | undefined {
+    return this.getUsers().find((u) => u.id === id);
+  }
+
+  public getUserByUsername(username: string): SystemUser | undefined {
+    const normalized = username.toLowerCase().trim();
+    return this.getUsers().find((u) => u.username.toLowerCase().trim() === normalized);
+  }
+
+  public createUser(userData: {
+    username: string;
+    name: string;
+    password?: string;
+    role: UserRole;
+    status?: 'active' | 'inactive';
+    permissions?: Partial<UserPermissions>;
+  }): SystemUser {
+    const normalized = userData.username.toLowerCase().trim();
+    if (this.getUserByUsername(normalized)) {
+      throw new Error(`El nombre de usuario "${normalized}" ya está registrado.`);
+    }
+
+    const role: UserRole = userData.role || 'digitalizador';
+    const defaultPerms = DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.custom;
+    const finalPermissions: UserPermissions = {
+      ...defaultPerms,
+      ...(userData.permissions || {}),
+    };
+
+    const newUser: SystemUser = {
+      id: 'usr-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      username: normalized,
+      name: userData.name.trim(),
+      password: userData.password?.trim() || '12345678',
+      role,
+      status: userData.status || 'active',
+      permissions: finalPermissions,
+      createdAt: new Date().toISOString(),
+    };
+
+    this.data.users = this.data.users || [];
+    this.data.users.push(newUser);
+    this.persist();
+    return newUser;
+  }
+
+  public updateUser(
+    id: string,
+    updates: Partial<{
+      username: string;
+      name: string;
+      password?: string;
+      role: UserRole;
+      status: 'active' | 'inactive';
+      permissions: Partial<UserPermissions>;
+      lastLogin?: string;
+    }>
+  ): SystemUser | null {
+    const user = this.getUserById(id);
+    if (!user) return null;
+
+    if (updates.username) {
+      const norm = updates.username.toLowerCase().trim();
+      const existing = this.getUserByUsername(norm);
+      if (existing && existing.id !== id) {
+        throw new Error(`El nombre de usuario "${norm}" ya está en uso.`);
+      }
+      user.username = norm;
+    }
+
+    if (updates.name !== undefined) user.name = updates.name.trim();
+    if (updates.password && updates.password.trim()) user.password = updates.password.trim();
+    if (updates.role !== undefined) user.role = updates.role;
+    if (updates.status !== undefined) user.status = updates.status;
+    if (updates.lastLogin !== undefined) user.lastLogin = updates.lastLogin;
+
+    if (updates.permissions) {
+      user.permissions = {
+        ...user.permissions,
+        ...updates.permissions,
+      };
+    } else if (updates.role && updates.role !== user.role && DEFAULT_ROLE_PERMISSIONS[updates.role]) {
+      user.permissions = { ...DEFAULT_ROLE_PERMISSIONS[updates.role] };
+    }
+
+    this.persist();
+    return user;
+  }
+
+  public deleteUser(id: string): boolean {
+    const user = this.getUserById(id);
+    if (!user) return false;
+
+    if (user.username === 'admin') {
+      throw new Error('No es posible eliminar el usuario Administrador principal del sistema.');
+    }
+
+    this.data.users = (this.data.users || []).filter((u) => u.id !== id);
+    this.persist();
+    return true;
+  }
+
   // --- MÉTODOS DE COPIA DE SEGURIDAD Y MIGRACIÓN ---
 
   public getRawData(): DatabaseData {
@@ -1055,6 +1171,7 @@ class Database {
     categoriasCount: number;
     correosCount: number;
     campaignsCount: number;
+    usersCount: number;
   } {
     if (!imported || typeof imported !== 'object') {
       throw new Error('Archivo de base de datos inválido');
@@ -1081,6 +1198,12 @@ class Database {
     if (Array.isArray(imported.unsubscribed)) {
       this.data.unsubscribed = imported.unsubscribed;
     }
+    if (Array.isArray(imported.users)) {
+      this.data.users = imported.users;
+    }
+    if (imported.landingConfig && typeof imported.landingConfig === 'object') {
+      this.data.landingConfig = imported.landingConfig;
+    }
 
     this.persist();
 
@@ -1089,7 +1212,32 @@ class Database {
       categoriasCount: this.data.categorias.length,
       correosCount: this.data.correos.length,
       campaignsCount: (this.data.campaigns || []).length,
+      usersCount: (this.data.users || []).length,
     };
+  }
+
+  public getLandingConfig(): LandingConfig {
+    if (!this.data.landingConfig) {
+      this.data.landingConfig = JSON.parse(JSON.stringify(DEFAULT_LANDING_CONFIG));
+      this.persist();
+    }
+    return this.data.landingConfig || DEFAULT_LANDING_CONFIG;
+  }
+
+  public updateLandingConfig(configUpdates: Partial<LandingConfig>): LandingConfig {
+    const current = this.getLandingConfig();
+    this.data.landingConfig = {
+      ...current,
+      ...configUpdates,
+    };
+    this.persist();
+    return this.data.landingConfig || DEFAULT_LANDING_CONFIG;
+  }
+
+  public resetLandingConfig(): LandingConfig {
+    this.data.landingConfig = JSON.parse(JSON.stringify(DEFAULT_LANDING_CONFIG));
+    this.persist();
+    return this.data.landingConfig || DEFAULT_LANDING_CONFIG;
   }
 }
 

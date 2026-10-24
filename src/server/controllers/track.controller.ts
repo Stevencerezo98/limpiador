@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { db } from '../db/database.ts';
 
 // 1x1 GIF transparente estándar en Base64 (43 bytes)

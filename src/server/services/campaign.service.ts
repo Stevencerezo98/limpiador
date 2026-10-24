@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { db } from '../db/database.ts';
-import { Campaign, CampaignLog } from '../db/schema.ts';
+import type { Campaign, CampaignLog } from '../db/schema.ts';
 
 interface SendJobState {
   campaignId: string;

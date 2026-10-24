@@ -19,6 +19,9 @@ apiRouter.use('/track', trackRoutes);
 // Endpoint público para obtener los planes de depuración activos en la landing
 apiRouter.get('/plans', AdminController.getPublicPlans);
 
+// Endpoint público para obtener el contenido CMS de la landing (unio.my)
+apiRouter.get('/landing', AdminController.getPublicLandingConfig);
+
 // Endpoint para actualizar plan y recargar créditos
 apiRouter.post('/plans/upgrade', AdminController.upgradePlan);
 

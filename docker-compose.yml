@@ -1,0 +1,15 @@
+services:
+  cleanmail:
+    build: .
+    container_name: cleanmail-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_DOMAIN=cleanmail.uno.my
+      - LANDING_DOMAIN=unio.my
+    volumes:
+      # Persistencia de la base de datos de correos, planes y usuarios
+      - ./data:/app/data

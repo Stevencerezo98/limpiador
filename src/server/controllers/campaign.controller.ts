@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { db } from '../db/database.ts';
 import { campaignService } from '../services/campaign.service.ts';
 

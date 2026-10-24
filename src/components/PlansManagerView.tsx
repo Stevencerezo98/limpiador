@@ -519,8 +519,8 @@ export const PlansManagerView: React.FC<PlansManagerViewProps> = ({
                 </label>
                 <input
                   type="number"
-                  min="1"
-                  step="500"
+                  min="0"
+                  step="1"
                   required
                   value={formCredits}
                   onChange={(e) => setFormCredits(Number(e.target.value))}

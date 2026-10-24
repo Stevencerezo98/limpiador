@@ -19,4 +19,15 @@ router.post('/plans/reset', AuthController.requireAdmin, AdminController.resetPl
 router.get('/backup', AuthController.requireAdmin, AdminController.downloadBackup);
 router.post('/restore', AuthController.requireAdmin, AdminController.restoreBackup);
 
+// Gestión de Usuarios y Permisos (RBAC - Exclusivo Administrador)
+router.get('/users', AuthController.requireAdmin, AdminController.getUsers);
+router.post('/users', AuthController.requireAdmin, AdminController.createUser);
+router.put('/users/:id', AuthController.requireAdmin, AdminController.updateUser);
+router.delete('/users/:id', AuthController.requireAdmin, AdminController.deleteUser);
+
+// Editor CMS de la Página Landing (Exclusivo Administrador)
+router.get('/landing', AuthController.requireAdmin, AdminController.getPublicLandingConfig);
+router.put('/landing', AuthController.requireAdmin, AdminController.updateLandingConfig);
+router.post('/landing/reset', AuthController.requireAdmin, AdminController.resetLandingConfig);
+
 export default router;

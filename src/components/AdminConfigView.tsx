@@ -12,16 +12,19 @@ import {
   Sparkles,
   Database,
   Download,
+  LayoutTemplate,
   Server,
 } from 'lucide-react';
 import { SystemConfig, UserSession } from '../server/db/schema.ts';
 import { BackupRestoreModal } from './BackupRestoreModal.tsx';
+import { UsersManagerSection } from './UsersManagerSection.tsx';
 
 interface AdminConfigViewProps {
   session: UserSession;
+  onOpenLandingEditor?: () => void;
 }
 
-export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => {
+export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session, onOpenLandingEditor }) => {
   const [config, setConfig] = useState<SystemConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -146,14 +149,27 @@ export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => 
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsBackupModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-xs"
-        >
-          <Database className="w-4 h-4 text-purple-600" />
-          <span>Copia de Seguridad & Servidor</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          {onOpenLandingEditor && (
+            <button
+              type="button"
+              onClick={onOpenLandingEditor}
+              className="px-4 py-2.5 rounded-xl bg-[#00a2c7]/10 hover:bg-[#00a2c7]/20 text-[#00a2c7] border border-[#00a2c7]/30 font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-xs"
+            >
+              <LayoutTemplate className="w-4 h-4" />
+              <span>Editar Landing Page</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsBackupModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-bold text-xs transition flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Database className="w-4 h-4 text-purple-600" />
+            <span>Copia de Seguridad & Servidor</span>
+          </button>
+        </div>
       </div>
 
       {successMessage && (
@@ -255,7 +271,7 @@ export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => 
                 <input
                   type="number"
                   min="0"
-                  step="1000"
+                  step="1"
                   value={creditosDisponibles}
                   onChange={(e) => setCreditosDisponibles(parseInt(e.target.value, 10) || 0)}
                   className="w-full text-base font-extrabold font-mono px-3.5 py-2.5 rounded-xl border border-slate-300 text-[#00a2c7] bg-white focus:outline-none focus:ring-2 focus:ring-[#00a2c7]"
@@ -269,7 +285,7 @@ export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => 
                 <input
                   type="number"
                   min="0"
-                  step="5000"
+                  step="1"
                   value={limiteMensual}
                   onChange={(e) => setLimiteMensual(parseInt(e.target.value, 10) || 0)}
                   className="w-full text-base font-extrabold font-mono px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#00a2c7]"
@@ -347,71 +363,8 @@ export const AdminConfigView: React.FC<AdminConfigViewProps> = ({ session }) => 
           </div>
         </div>
 
-        {/* Roles and Permissions Matrix */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-          <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-            <Users className="w-5 h-5 text-[#00a2c7]" />
-            <h2 className="text-base font-bold text-slate-900">
-              Matriz de Permisos por Rol (RBAC)
-            </h2>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
-                <tr>
-                  <th className="px-4 py-2.5">Funcionalidad</th>
-                  <th className="px-4 py-2.5 text-center">Administrador</th>
-                  <th className="px-4 py-2.5 text-center">Digitalizador</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                <tr>
-                  <td className="px-4 py-2.5 font-medium text-slate-800">
-                    Subir y procesar archivos masivos (.csv, .xlsx, .txt)
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-2.5 font-medium text-slate-800">
-                    Exportar listas limpias a formato CSV
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-2.5 font-medium text-slate-800">
-                    Editar y corregir correos individuales en la tabla
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-2.5 font-medium text-slate-800">
-                    Borrado masivo y purga de correos inválidos
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                  <td className="px-4 py-2.5 text-center text-emerald-600 font-bold">✓ Permitido</td>
-                </tr>
-                <tr className="bg-purple-50/40">
-                  <td className="px-4 py-2.5 font-bold text-purple-950">
-                    Modificar Plan del Sistema y Asignación de Créditos
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-purple-700 font-black">✓ Exclusivo</td>
-                  <td className="px-4 py-2.5 text-center text-rose-500 font-bold">✕ Denegado</td>
-                </tr>
-                <tr className="bg-purple-50/40">
-                  <td className="px-4 py-2.5 font-bold text-purple-950">
-                    Configuración de políticas del motor de depuración
-                  </td>
-                  <td className="px-4 py-2.5 text-center text-purple-700 font-black">✓ Exclusivo</td>
-                  <td className="px-4 py-2.5 text-center text-rose-500 font-bold">✕ Denegado</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        {/* Módulo Interactivo de Gestión de Usuarios & Control de Accesos (RBAC) */}
+        <UsersManagerSection session={session} />
 
         {/* Backup and Server Update Overview Card */}
         <div className="bg-gradient-to-r from-purple-50/70 via-white to-blue-50/70 rounded-2xl border border-purple-200/80 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">

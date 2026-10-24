@@ -14,6 +14,8 @@ import {
   CreditCard,
   ExternalLink,
   Send,
+  Users,
+  LayoutTemplate,
 } from 'lucide-react';
 import { UserRole } from '../server/db/schema.ts';
 
@@ -25,6 +27,8 @@ export type CleanMailTab =
   | 'campaigns'
   | 'admin_config'
   | 'plans'
+  | 'users'
+  | 'landing_editor'
   | 'api'
   | 'faq'
   | 'terminology';
@@ -201,6 +205,40 @@ export const CleanMailSidebar: React.FC<SidebarProps> = ({
                 <Settings className="w-4 h-4" />
                 <span>Configuración Sistema</span>
               </div>
+            </button>
+
+            <button
+              onClick={() => onSelectTab('users')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+                activeTab === 'users'
+                  ? 'bg-white/25 text-white font-bold shadow-inner border border-white/30'
+                  : 'text-purple-100 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Users className="w-4 h-4" />
+                <span>Usuarios & Permisos</span>
+              </div>
+              <span className="text-[9px] bg-purple-900/40 text-purple-100 px-1.5 py-0.5 rounded font-bold">
+                RBAC
+              </span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab('landing_editor')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+                activeTab === 'landing_editor'
+                  ? 'bg-white/25 text-white font-bold shadow-inner border border-white/30'
+                  : 'text-purple-100 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <LayoutTemplate className="w-4 h-4" />
+                <span>Editor Landing Page</span>
+              </div>
+              <span className="text-[9px] bg-purple-900/40 text-purple-100 px-1.5 py-0.5 rounded font-bold">
+                CMS
+              </span>
             </button>
 
             <button

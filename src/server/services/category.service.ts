@@ -1,5 +1,5 @@
 import { db } from '../db/database.ts';
-import { Categoria } from '../db/schema.ts';
+import type { Categoria } from '../db/schema.ts';
 
 export class CategoryService {
   public static getAllCategories(): Categoria[] {

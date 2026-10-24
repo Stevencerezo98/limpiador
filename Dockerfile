@@ -1,33 +1,35 @@
-# Imagen base ligera con Node.js 20 sobre Alpine Linux
-FROM node:20-alpine
+# Multi-stage Dockerfile para CleanMail en Producción
+FROM node:22-alpine AS builder
 
-# Definir directorio de trabajo de la aplicación
 WORKDIR /app
 
-# Instalar dependencias necesarias para compilación y utilidades del sistema
-RUN apk add --no-cache libc6-compat
-
-# Copiar manifiestos de paquetes
+# Copiar manifiestos de dependencias
 COPY package*.json ./
+RUN npm ci
 
-# Instalar todas las dependencias (incluyendo herramientas de compilación y runtime tsx)
-RUN npm install
-
-# Copiar el código fuente completo del proyecto
+# Copiar código fuente y compilar cliente estático para producción
 COPY . .
-
-# Crear el directorio persistente de base de datos
-RUN mkdir -p data
-
-# Compilar la aplicación frontend con Vite
 RUN npm run build
 
-# Configurar variables de entorno para producción
+# Etapa final ligera
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Exponer el puerto de la aplicación
+# Copiar dependencias de producción y build compilado
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/data ./data
+COPY --from=builder /app/server.ts ./server.ts
+COPY --from=builder /app/src ./src
+
+# Exponer el puerto configurado
 EXPOSE 3000
 
-# Comando para iniciar el servidor de producción
-CMD ["npm", "start"]
+# Iniciar servidor Node
+CMD ["node", "server.ts"]

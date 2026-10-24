@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { CategoryService } from '../services/category.service.ts';
 
 export class CategoryController {
