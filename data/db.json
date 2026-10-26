@@ -29308,5 +29308,29 @@
       "tagline": "Plataforma Profesional de Limpieza, Verificación y Envíos Masivos de Email",
       "copyrightText": "Todos los derechos reservados. Desarrollado para alta entregabilidad en marketing B2B y B2C."
     }
+  },
+  "license": {
+    "rawKey": "CLM-1.eyJsaWNlbnNlSWQiOiJMSUMtNkQyMkVEOEMiLCJjbGllbnROYW1lIjoiQ2xpZW50ZSBDbGVhbk1haWwgT2ZpY2lhbCIsImNsaWVudEVtYWlsIjoiYWRtaW5AdW5pby5teSIsImRvbWFpbiI6ImNsZWFubWFpbC51bmlvLm15LHVuaW8ubXksbG9jYWxob3N0IiwicGxhbiI6ImVudGVycHJpc2UiLCJpc3N1ZWRBdCI6IjIwMjYtMTAtMjZUMDc6MDM6MDkuOTg0WiIsImV4cGlyZXNBdCI6IjIwMjctMTAtMjZUMDc6MDM6MDkuOTg0WiIsIm1heENyZWRpdHMiOjUwMDAwMCwibWF4VXNlcnMiOjEwLCJmZWF0dXJlcyI6WyJ2YWxpZGF0aW9uIiwiY2FtcGFpZ25zIiwiYXBpIiwicmJhYyIsImxhbmRpbmdfY21zIiwiZG5zX214Il19.eb788c352f91f0efb2f84ce7492fb00816e0d85b918fd07e8a3da1f25d6b931a",
+    "payload": {
+      "licenseId": "LIC-6D22ED8C",
+      "clientName": "Cliente CleanMail Oficial",
+      "clientEmail": "admin@unio.my",
+      "domain": "cleanmail.unio.my,unio.my,localhost",
+      "plan": "enterprise",
+      "issuedAt": "2026-10-26T07:03:09.984Z",
+      "expiresAt": "2027-10-26T07:03:09.984Z",
+      "maxCredits": 500000,
+      "maxUsers": 10,
+      "features": [
+        "validation",
+        "campaigns",
+        "api",
+        "rbac",
+        "landing_cms",
+        "dns_mx"
+      ]
+    },
+    "signature": "eb788c352f91f0efb2f84ce7492fb00816e0d85b918fd07e8a3da1f25d6b931a",
+    "activatedAt": "2026-10-26T07:03:09.984Z"
   }
 }

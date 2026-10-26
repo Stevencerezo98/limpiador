@@ -14,6 +14,7 @@ import type {
   UserRole,
   UserPermissions,
   LandingConfig,
+  AppLicense,
 } from './schema.ts';
 import { DEFAULT_ROLE_PERMISSIONS, DEFAULT_LANDING_CONFIG } from './schema.ts';
 
@@ -27,6 +28,7 @@ interface DatabaseData {
   unsubscribed?: UnsubscribedContact[];
   users?: SystemUser[];
   landingConfig?: LandingConfig;
+  license?: AppLicense;
 }
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -1204,6 +1206,9 @@ class Database {
     if (imported.landingConfig && typeof imported.landingConfig === 'object') {
       this.data.landingConfig = imported.landingConfig;
     }
+    if (imported.license && typeof imported.license === 'object') {
+      this.data.license = imported.license;
+    }
 
     this.persist();
 
@@ -1238,6 +1243,20 @@ class Database {
     this.data.landingConfig = JSON.parse(JSON.stringify(DEFAULT_LANDING_CONFIG));
     this.persist();
     return this.data.landingConfig || DEFAULT_LANDING_CONFIG;
+  }
+
+  public getLicense(): AppLicense | null {
+    return this.data.license || null;
+  }
+
+  public saveLicense(license: AppLicense): void {
+    this.data.license = license;
+    this.persist();
+  }
+
+  public deleteLicense(): void {
+    delete this.data.license;
+    this.persist();
   }
 }
 

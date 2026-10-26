@@ -16,6 +16,7 @@ import { UpgradePlanModal } from './components/UpgradePlanModal.tsx';
 import { CampaignsView } from './components/campaigns/CampaignsView.tsx';
 import { UsersManagerSection } from './components/UsersManagerSection.tsx';
 import { LandingEditorView } from './components/LandingEditorView.tsx';
+import { LicenseManagerView } from './components/LicenseManagerView.tsx';
 import {
   Categoria,
   Correo,
@@ -83,6 +84,7 @@ export default function App() {
   // Configuración de créditos y plan
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
   const [isGlobalUpgradeModalOpen, setIsGlobalUpgradeModalOpen] = useState(false);
+  const [licenseInfo, setLicenseInfo] = useState<{ valid: boolean; message: string; daysRemaining?: number } | null>(null);
 
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingEmails, setLoadingEmails] = useState(false);
@@ -192,6 +194,18 @@ export default function App() {
       fetchGlobalStats();
     }
   }, [session, fetchCategories, fetchGlobalStats]);
+
+  // Consultar estado de licencia del software
+  useEffect(() => {
+    fetch('/api/license/status')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setLicenseInfo(data.data);
+        }
+      })
+      .catch((err) => console.error('Error al verificar licencia:', err));
+  }, []);
 
   // Consultar correos cuando cambian filtros o categoría
   useEffect(() => {
@@ -568,7 +582,7 @@ export default function App() {
           activeTab={activeTab}
           onSelectTab={(tab) => {
             // Protección de rol: Si no es admin y quiere entrar a vistas administrativas, redirigir
-            if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor') && session.role !== 'admin') {
+            if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor' || tab === 'license') && session.role !== 'admin') {
               setActiveTab('list');
               return;
             }
@@ -592,7 +606,7 @@ export default function App() {
             <CleanMailSidebar
               activeTab={activeTab}
               onSelectTab={(tab) => {
-                if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor') && session.role !== 'admin') {
+                if ((tab === 'admin_config' || tab === 'plans' || tab === 'users' || tab === 'landing_editor' || tab === 'license') && session.role !== 'admin') {
                   setActiveTab('list');
                 } else {
                   setActiveTab(tab);
@@ -632,6 +646,27 @@ export default function App() {
           onGoToAdminConfig={() => setActiveTab('admin_config')}
           onOpenLanding={() => setShowLanding(true)}
         />
+
+        {/* Banner de Licencia Invalida o Expirada */}
+        {licenseInfo && !licenseInfo.valid && (
+          <div className="bg-rose-600 text-white px-4 py-2.5 text-xs flex items-center justify-between font-semibold shadow-md">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-white animate-ping shrink-0"></span>
+              <span>
+                <strong>BLOQUEO DE LICENCIA:</strong> {licenseInfo.message} (Operaciones restringidas)
+              </span>
+            </div>
+            {session.role === 'admin' && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('license')}
+                className="px-3 py-1 bg-white text-rose-700 hover:bg-rose-50 rounded-lg text-xs font-bold transition cursor-pointer shrink-0"
+              >
+                Activar Licencia
+              </button>
+            )}
+          </div>
+        )}
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {activeTab === 'single' && <SingleEmailView />}
@@ -748,6 +783,10 @@ export default function App() {
               session={session}
               onPreviewLanding={() => setShowLanding(true)}
             />
+          )}
+
+          {activeTab === 'license' && session.role === 'admin' && (
+            <LicenseManagerView session={session} />
           )}
 
           {activeTab === 'admin_config' && session.role === 'admin' && (

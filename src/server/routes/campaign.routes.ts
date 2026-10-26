@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { CampaignController } from '../controllers/campaign.controller.ts';
+import { requireValidLicense } from '../middlewares/license.middleware.ts';
 
 const campaignRouter = Router();
 
@@ -15,13 +16,13 @@ campaignRouter.post('/smtp', CampaignController.updateSmtpConfig);
 campaignRouter.post('/smtp/test', CampaignController.testSmtpDirect);
 
 // Enviar correo individual 1 a 1 para probar entrega real y plantilla
-campaignRouter.post('/single-send', CampaignController.singleSend);
+campaignRouter.post('/single-send', requireValidLicense, CampaignController.singleSend);
 
 // Enviar correo de prueba previo (sin crear la campaña)
-campaignRouter.post('/preview-test', CampaignController.previewTest);
+campaignRouter.post('/preview-test', requireValidLicense, CampaignController.previewTest);
 
 // Crear nueva campaña
-campaignRouter.post('/', CampaignController.createCampaign);
+campaignRouter.post('/', requireValidLicense, CampaignController.createCampaign);
 
 // Consultar detalle de una campaña
 campaignRouter.get('/:id', CampaignController.getCampaignById);
@@ -39,7 +40,7 @@ campaignRouter.post('/:id/reset', CampaignController.resetCampaign);
 campaignRouter.delete('/:id', CampaignController.deleteCampaign);
 
 // Iniciar procesamiento y envío masivo a correos válidos
-campaignRouter.post('/:id/send', CampaignController.sendCampaign);
+campaignRouter.post('/:id/send', requireValidLicense, CampaignController.sendCampaign);
 
 // Pausar o cancelar envío activo
 campaignRouter.post('/:id/cancel', CampaignController.cancelCampaign);

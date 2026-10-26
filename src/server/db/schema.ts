@@ -600,6 +600,41 @@ export const DEFAULT_LANDING_CONFIG: LandingConfig = {
   },
 };
 
+// ==========================================
+// MÓDULO DE SEGURIDAD & LICENCIAMIENTO (ANTI-PIRATERÍA)
+// ==========================================
+
+export type LicensePlan = 'starter' | 'pro' | 'enterprise' | 'lifetime' | 'trial';
+
+export interface AppLicensePayload {
+  licenseId: string;
+  clientName: string;
+  clientEmail: string;
+  domain: string; // ej. "cleanmail.unio.my", "*" o múltiples separados por coma
+  plan: LicensePlan;
+  issuedAt: string;
+  expiresAt: string; // Fecha ISO o "never"
+  maxCredits: number; // -1 para ilimitados
+  maxUsers: number; // -1 para ilimitados
+  features: string[];
+}
+
+export interface AppLicense {
+  rawKey: string; // Formato: CLM-1.<payloadBase64>.<signatureHex>
+  payload: AppLicensePayload;
+  signature: string;
+  activatedAt: string;
+}
+
+export interface LicenseVerificationResult {
+  valid: boolean;
+  status: 'ACTIVE' | 'EXPIRED' | 'DOMAIN_MISMATCH' | 'INVALID_SIGNATURE' | 'NO_LICENSE';
+  message: string;
+  daysRemaining?: number;
+  license?: AppLicensePayload;
+  rawKey?: string;
+}
+
 // Exportaciones de compatibilidad en tiempo de ejecución para Node.js ESM nativo
 export const Categoria = {} as any;
 export const Correo = {} as any;
@@ -624,5 +659,9 @@ export const LandingTestimonial = {} as any;
 export const LandingFaqItem = {} as any;
 export const LandingTrustStat = {} as any;
 export const LandingSecurityBadge = {} as any;
+export const AppLicense = {} as any;
+export const LicenseVerificationResult = {} as any;
+export const AppLicensePayload = {} as any;
+
 
 

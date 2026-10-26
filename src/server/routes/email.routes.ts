@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { EmailController } from '../controllers/email.controller.ts';
 import { uploadMiddleware } from '../middlewares/upload.middleware.ts';
+import { requireValidLicense } from '../middlewares/license.middleware.ts';
 
 const router = Router();
 
-// Endpoint: POST /api/emails/upload - Subir archivos para depuración
+// Endpoint: POST /api/emails/upload - Subir archivos para depuración (Requiere Licencia)
 router.post(
   '/upload',
+  requireValidLicense,
   uploadMiddleware.any() as any,
   EmailController.uploadAndProcess
 );
@@ -15,19 +17,19 @@ router.post(
 router.get('/category/:id', EmailController.getByCategory);
 
 // Endpoint: GET /api/emails/export/:id - Exportar la lista limpia a CSV (delimitador ;)
-router.get('/export/:id', EmailController.exportCleanCsv);
+router.get('/export/:id', requireValidLicense, EmailController.exportCleanCsv);
 
 // Endpoint: GET /api/emails/export-xlsx/:id - Exportar la lista limpia a formato nativo Excel (.xlsx)
-router.get('/export-xlsx/:id', EmailController.exportCleanXlsx);
+router.get('/export-xlsx/:id', requireValidLicense, EmailController.exportCleanXlsx);
 
 // Endpoint: GET /api/emails/export-txt/:id - Exportar lista de correos en texto plano (uno por línea)
-router.get('/export-txt/:id', EmailController.exportCleanTxt);
+router.get('/export-txt/:id', requireValidLicense, EmailController.exportCleanTxt);
 
 // Endpoint: POST /api/emails/reaudit-category/:id - Re-auditar categoría completa con reglas anti-fraude
-router.post('/reaudit-category/:id', EmailController.reauditCategory);
+router.post('/reaudit-category/:id', requireValidLicense, EmailController.reauditCategory);
 
 // Validación en vivo de un correo individual
-router.post('/validate-single', EmailController.validateSingle);
+router.post('/validate-single', requireValidLicense, EmailController.validateSingle);
 
 // Estadísticas globales
 router.get('/stats', EmailController.getStats);

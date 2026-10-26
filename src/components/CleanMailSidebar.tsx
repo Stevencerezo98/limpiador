@@ -16,6 +16,7 @@ import {
   Send,
   Users,
   LayoutTemplate,
+  Key,
 } from 'lucide-react';
 import { UserRole } from '../server/db/schema.ts';
 
@@ -29,6 +30,7 @@ export type CleanMailTab =
   | 'plans'
   | 'users'
   | 'landing_editor'
+  | 'license'
   | 'api'
   | 'faq'
   | 'terminology';
@@ -238,6 +240,23 @@ export const CleanMailSidebar: React.FC<SidebarProps> = ({
               </div>
               <span className="text-[9px] bg-purple-900/40 text-purple-100 px-1.5 py-0.5 rounded font-bold">
                 CMS
+              </span>
+            </button>
+
+            <button
+              onClick={() => onSelectTab('license')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer ${
+                activeTab === 'license'
+                  ? 'bg-white/25 text-white font-bold shadow-inner border border-white/30'
+                  : 'text-purple-100 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Key className="w-4 h-4" />
+                <span>Licencia del Software</span>
+              </div>
+              <span className="text-[9px] bg-purple-900/40 text-purple-100 px-1.5 py-0.5 rounded font-bold">
+                PRO
               </span>
             </button>
 
