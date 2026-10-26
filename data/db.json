@@ -29027,7 +29027,7 @@
         "canBackupRestore": true
       },
       "createdAt": "2026-10-24T06:56:17.763Z",
-      "lastLogin": "2026-10-24T07:04:08.654Z"
+      "lastLogin": "2026-10-26T07:14:14.462Z"
     },
     {
       "id": "usr-digitalizador",
@@ -29332,5 +29332,6 @@
     },
     "signature": "eb788c352f91f0efb2f84ce7492fb00816e0d85b918fd07e8a3da1f25d6b931a",
     "activatedAt": "2026-10-26T07:03:09.984Z"
-  }
+  },
+  "generatedLicenses": []
 }

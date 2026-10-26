@@ -23,6 +23,8 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 // Clave Secreta Maestra (Debe coincidir con la del servidor)
 const MASTER_SECRET =
@@ -108,6 +110,25 @@ function main() {
     .digest('hex');
 
   const rawLicenseKey = `CLM-1.${payloadBase64}.${signature}`;
+
+  // Guardar en la base de datos data/db.json si existe
+  try {
+    const dbPath = path.resolve(process.cwd(), 'data', 'db.json');
+    if (fs.existsSync(dbPath)) {
+      const dbData = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+      if (!Array.isArray(dbData.generatedLicenses)) {
+        dbData.generatedLicenses = [];
+      }
+      dbData.generatedLicenses.unshift({
+        ...payload,
+        rawKey: rawLicenseKey,
+        status: 'PENDING',
+      });
+      fs.writeFileSync(dbPath, JSON.stringify(dbData, null, 2), 'utf-8');
+    }
+  } catch (err) {
+    // Si no se puede escribir, continuar sin fallar
+  }
 
   console.log('-------------------------------------------------------------');
   console.log('✅ ¡LICENCIA GENERADA EXITOSAMENTE!');

@@ -626,9 +626,29 @@ export interface AppLicense {
   activatedAt: string;
 }
 
+export interface GeneratedLicenseRecord {
+  licenseId: string;
+  rawKey: string;
+  clientName: string;
+  clientEmail: string;
+  domain: string;
+  plan: LicensePlan;
+  issuedAt: string;
+  expiresAt: string;
+  maxCredits: number;
+  maxUsers: number;
+  status: 'PENDING' | 'ACTIVE' | 'REVOKED' | 'EXPIRED';
+  revokedAt?: string;
+  revocationReason?: string;
+  activatedAt?: string;
+  activatedHost?: string;
+  activatedIp?: string;
+  lastPingAt?: string;
+}
+
 export interface LicenseVerificationResult {
   valid: boolean;
-  status: 'ACTIVE' | 'EXPIRED' | 'DOMAIN_MISMATCH' | 'INVALID_SIGNATURE' | 'NO_LICENSE';
+  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED' | 'DOMAIN_MISMATCH' | 'INVALID_SIGNATURE' | 'NO_LICENSE';
   message: string;
   daysRemaining?: number;
   license?: AppLicensePayload;
@@ -662,6 +682,7 @@ export const LandingSecurityBadge = {} as any;
 export const AppLicense = {} as any;
 export const LicenseVerificationResult = {} as any;
 export const AppLicensePayload = {} as any;
+export const GeneratedLicenseRecord = {} as any;
 
 
 

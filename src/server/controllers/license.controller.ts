@@ -38,7 +38,8 @@ export class LicenseController {
       }
 
       const host = (req.headers.host || '').toString();
-      const result = LicenseService.activateLicense(licenseKey.trim(), host);
+      const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip || '').toString();
+      const result = LicenseService.activateLicense(licenseKey.trim(), host, ip);
 
       if (!result.valid) {
         return res.status(400).json({
@@ -57,6 +58,112 @@ export class LicenseController {
       return res.status(500).json({
         success: false,
         message: (err as Error).message || 'Error al procesar la activación de la licencia.',
+      });
+    }
+  }
+
+  /**
+   * Obtiene la lista completa de todas las licencias emitidas (Registro Maestro)
+   * GET /api/license/generated
+   */
+  public static getAllGenerated(_req: Request, res: Response) {
+    try {
+      const list = db.getGeneratedLicenses();
+      return res.status(200).json({
+        success: true,
+        data: list,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: (err as Error).message,
+      });
+    }
+  }
+
+  /**
+   * Revoca / Invalida una licencia en el acto
+   * POST /api/license/revoke/:id
+   */
+  public static revoke(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body || {};
+      const success = db.revokeLicense(id, reason);
+
+      if (!success) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontró la licencia en el registro maestro.',
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Licencia ${id} INVALIDADA. Ningún servidor ni cliente podrá utilizarla a partir de este momento.`,
+        data: { licenseId: id, status: 'REVOKED' },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: (err as Error).message,
+      });
+    }
+  }
+
+  /**
+   * Reactiva una licencia previamente revocada
+   * POST /api/license/reactivate/:id
+   */
+  public static reactivate(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const success = db.reactivateLicense(id);
+
+      if (!success) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontró la licencia en el registro.',
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Licencia ${id} reactivada correctamente. El cliente vuelve a tener acceso total.`,
+        data: { licenseId: id, status: 'ACTIVE' },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: (err as Error).message,
+      });
+    }
+  }
+
+  /**
+   * Elimina permanentemente una licencia del registro maestro
+   * DELETE /api/license/generated/:id
+   */
+  public static deleteGenerated(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const success = db.deleteGeneratedLicense(id);
+
+      if (!success) {
+        return res.status(404).json({
+          success: false,
+          message: 'Licencia no encontrada en el registro.',
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Registro de licencia ${id} eliminado.`,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: (err as Error).message,
       });
     }
   }
@@ -96,7 +203,7 @@ export class LicenseController {
 
       return res.status(201).json({
         success: true,
-        message: '¡Clave de licencia generada exitosamente!',
+        message: '¡Clave de licencia generada y registrada exitosamente!',
         data: generated,
       });
     } catch (err) {
@@ -108,8 +215,8 @@ export class LicenseController {
   }
 
   /**
-   * Elimina la licencia actual para pruebas
-   * DELETE /api/admin/license
+   * Elimina la licencia actual instalada localmente
+   * DELETE /api/license
    */
   public static remove(_req: Request, res: Response) {
     try {

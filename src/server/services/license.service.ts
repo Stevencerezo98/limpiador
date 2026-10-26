@@ -64,6 +64,13 @@ export class LicenseService {
 
     const rawKey = `CLM-1.${payloadBase64}.${signature}`;
 
+    // Registrar en la base de datos maestra de licencias emitidas (estado PENDING inicial)
+    db.addGeneratedLicense({
+      ...payload,
+      rawKey,
+      status: 'PENDING',
+    });
+
     return { rawKey, payload };
   }
 
@@ -117,6 +124,18 @@ export class LicenseService {
         valid: false,
         status: 'INVALID_SIGNATURE',
         message: 'Error al interpretar los datos cifrados de la licencia.',
+      };
+    }
+
+    // 2.5 Verificar si la licencia fue revocada / invalidada por el desarrollador
+    if (db.isLicenseRevoked(payload.licenseId)) {
+      return {
+        valid: false,
+        status: 'REVOKED',
+        message: 'Esta licencia fue REVOCADA o INVALIDADA por el desarrollador. Acceso al sistema bloqueado.',
+        daysRemaining: 0,
+        license: payload,
+        rawKey,
       };
     }
 
@@ -198,7 +217,8 @@ export class LicenseService {
    */
   public static activateLicense(
     rawKey: string,
-    currentHost?: string
+    currentHost?: string,
+    ipAddress?: string
   ): LicenseVerificationResult {
     const result = this.verifyLicenseKey(rawKey, currentHost);
     if (!result.valid || !result.license) {
@@ -213,6 +233,15 @@ export class LicenseService {
     };
 
     db.saveLicense(appLicense);
+
+    // Actualizar registro en la base de datos maestra con datos de la máquina
+    db.updateGeneratedLicense(result.license.licenseId, {
+      status: 'ACTIVE',
+      activatedAt: new Date().toISOString(),
+      activatedHost: currentHost || 'localhost',
+      activatedIp: ipAddress || '127.0.0.1',
+      lastPingAt: new Date().toISOString(),
+    });
 
     // Si la licencia tiene créditos específicos asignados, ajustar configuración
     if (result.license.maxCredits && result.license.maxCredits > 0) {

@@ -15,6 +15,7 @@ import type {
   UserPermissions,
   LandingConfig,
   AppLicense,
+  GeneratedLicenseRecord,
 } from './schema.ts';
 import { DEFAULT_ROLE_PERMISSIONS, DEFAULT_LANDING_CONFIG } from './schema.ts';
 
@@ -29,6 +30,7 @@ interface DatabaseData {
   users?: SystemUser[];
   landingConfig?: LandingConfig;
   license?: AppLicense;
+  generatedLicenses?: GeneratedLicenseRecord[];
 }
 
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -1209,6 +1211,9 @@ class Database {
     if (imported.license && typeof imported.license === 'object') {
       this.data.license = imported.license;
     }
+    if (Array.isArray(imported.generatedLicenses)) {
+      this.data.generatedLicenses = imported.generatedLicenses;
+    }
 
     this.persist();
 
@@ -1257,6 +1262,79 @@ class Database {
   public deleteLicense(): void {
     delete this.data.license;
     this.persist();
+  }
+
+  public getGeneratedLicenses(): GeneratedLicenseRecord[] {
+    if (!Array.isArray(this.data.generatedLicenses)) {
+      this.data.generatedLicenses = [];
+      this.persist();
+    }
+    return this.data.generatedLicenses;
+  }
+
+  public addGeneratedLicense(record: GeneratedLicenseRecord): void {
+    const list = this.getGeneratedLicenses();
+    const existingIdx = list.findIndex((l) => l.licenseId === record.licenseId);
+    if (existingIdx >= 0) {
+      list[existingIdx] = record;
+    } else {
+      list.unshift(record);
+    }
+    this.data.generatedLicenses = list;
+    this.persist();
+  }
+
+  public updateGeneratedLicense(
+    licenseId: string,
+    updates: Partial<GeneratedLicenseRecord>
+  ): GeneratedLicenseRecord | null {
+    const list = this.getGeneratedLicenses();
+    const idx = list.findIndex((l) => l.licenseId === licenseId);
+    if (idx < 0) return null;
+    list[idx] = { ...list[idx], ...updates };
+    this.data.generatedLicenses = list;
+    this.persist();
+    return list[idx];
+  }
+
+  public revokeLicense(licenseId: string, reason?: string): boolean {
+    const updated = this.updateGeneratedLicense(licenseId, {
+      status: 'REVOKED',
+      revokedAt: new Date().toISOString(),
+      revocationReason: reason || 'Revocada manualmente por el Administrador.',
+    });
+
+    // Si la licencia activa en este servidor coincide con la revocada, invalidarla
+    if (this.data.license?.payload.licenseId === licenseId) {
+      this.data.license.payload.features = [];
+      this.persist();
+    }
+
+    return Boolean(updated);
+  }
+
+  public reactivateLicense(licenseId: string): boolean {
+    const updated = this.updateGeneratedLicense(licenseId, {
+      status: 'ACTIVE',
+      revokedAt: undefined,
+      revocationReason: undefined,
+    });
+    return Boolean(updated);
+  }
+
+  public deleteGeneratedLicense(licenseId: string): boolean {
+    const list = this.getGeneratedLicenses();
+    const filtered = list.filter((l) => l.licenseId !== licenseId);
+    if (filtered.length === list.length) return false;
+    this.data.generatedLicenses = filtered;
+    this.persist();
+    return true;
+  }
+
+  public isLicenseRevoked(licenseId: string): boolean {
+    const list = this.getGeneratedLicenses();
+    const found = list.find((l) => l.licenseId === licenseId);
+    return Boolean(found && found.status === 'REVOKED');
   }
 }
 
